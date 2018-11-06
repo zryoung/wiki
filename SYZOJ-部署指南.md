@@ -223,5 +223,7 @@ systemctl reload nginx
 
 更多关于 Nginx 的配置（如 HTTPS 支持）不在本文的讨论范围内，如有需要请自行查阅相关资料。
 
+完成网站端的部署后，请登录您的 SYZOJ 网址，注册您的用户，并授予其[全站管理员](https://github.com/syzoj/syzoj/wiki/%E7%AE%A1%E7%90%86%E5%85%A8%E7%AB%99%E7%AE%A1%E7%90%86%E5%91%98)权限。
+
 # 评测端的部署
 未完待续
