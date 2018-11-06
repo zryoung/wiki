@@ -10,9 +10,17 @@ SYZOJ 系统分为网站端与评测端两部分，尽管这两个部分可以�
 # 安装系统依赖项
 这些软件同时被网站端和评测端依赖，如果您将两部分服务运行在不同的服务器上，请分别在两台服务器上进行这个步骤，否则您只需要在唯一的服务器上进行这个步骤。
 
+之后的步骤中，我们需要使用 `curl` 下载一些文件。使用以下命令安装 `curl`：
+
+```bash
+apt update
+apt install curl
+```
+
 SYZOJ 的网站端基于 Node.js 编写。使用以下命令安装 Node.js 运行环境与用于安装 SYZOJ 依赖项的软件包管理器 Yarn：
 
 ```bash
+apt install gnupg2
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 curl -sL https://deb.nodesource.com/setup_8.x | bash -
@@ -92,10 +100,10 @@ cp /opt/syzoj/web/config-example.json /opt/syzoj/config/web.json
 ln -s ../config/web.json /opt/syzoj/web/config.json
 ```
 
-使用您熟悉的文本编辑器（以 Vim 为例）编辑 `/opt/syzoj/web/config.json`。如果您不熟悉任何命令行下的文本编辑器，可以考虑使用 `nano`，或者将该文件下载到本地进行编辑，并上传到服务器上。
+使用您熟悉的文本编辑器编辑 `/opt/syzoj/web/config.json`。如果您不熟悉任何命令行下的文本编辑器，可以考虑使用 `nano`，或者将该文件下载到本地进行编辑，并上传到服务器上。
 
 ```bash
-vim /opt/syzoj/web/config.json
+nano /opt/syzoj/web/config.json
 ```
 
 如下是您可能需要修改的一些配置项。其中名称加粗的配置项是您很有可能需要修改的。
@@ -138,8 +146,9 @@ mysql
 在 MariaDB 客户端中执行以下命令创建数据库以及 SYZOJ 网站端连接数据库所使用的用户。
 
 ```mysql
-CREATE DATABASE `syzoj` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+CREATE DATABASE `syzoj` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON `syzoj`.* TO "syzoj"@"localhost" IDENTIFIED BY "password";
+FLUSH PRIVILEGES;
 ```
 
 以上命令中的 `password` 为 SYZOJ 网站端连接数据库的密码，请使用与上文配置中相同的值。
@@ -184,6 +193,7 @@ map $http_upgrade $connection_upgrade {
 }
 
 server {
+    listen 80;
     listen [::]:80;
     
     server_name syzoj.example.com;
