@@ -105,8 +105,8 @@ vim /opt/syzoj/web/config.json
 * `port`：网站端监听的 TCP 端口。如果默认端口 `5283` 被占用，请将其修改为一个未经占用的端口，并通过修改后的端口连接到 SYZOJ 网站端。
 * `db`
 	* `database`：数据库名。如果您修改了数据库名，请在下一步创建数据库中同时修改。如果您对数据库不熟悉，请保留默认值 `syzoj`。
-	* `username`：连接到数据库的用户名。如果您修改了数据库名，请在下一步创建数据库中同时修改。如果您对数据库不熟悉，请保留默认值 `syzoj`。
-	* **`password`**：连接到数据库的密码。为安全起见，请使用随机密钥填写。
+	* `username`：连接数据库的用户名。如果您修改了数据库名，请在下一步创建数据库中同时修改。如果您对数据库不熟悉，请保留默认值 `syzoj`。
+	* **`password`**：连接数据库的密码。为安全起见，请使用随机密钥填写。
 	* `host`：数据库服务器地址。如果您将数据库运行在其他服务器上，请修改为其地址（本教程不讨论这种情况），否则请保留默认值 `127.0.0.1`。
 * **`session_secret`**：为安全起见，请使用随机密钥填写。
 * **`google_analytics`**：如果您使用 Google Analytics 统计您的 SYZOJ 网站访问数据，请设置为 Google 提供的形如 `UA-XXXXXXXX-X` 的字符串。保留默认值将禁用 Google Analytics。
@@ -121,12 +121,30 @@ ln -s ../sessions /opt/syzoj/web/sessions
 ```
 
 ## 创建账户
-为安全起见，我们不推荐在生产环境中使用 `root` 账户运行 SYZOJ 网页端。使用以下命令创建一个名为 `syzoj` 的普通账户，并授予它访问 SYZOJ 网页端程序、数据以及配置文件的权限。
+为安全起见，我们不推荐在生产环境中使用 `root` 账户运行 SYZOJ 网站端。使用以下命令创建一个名为 `syzoj` 的普通账户，并授予它访问 SYZOJ 网站端程序、数据以及配置文件的权限。
 
 ```bash
 adduser --disabled-password --gecos "" syzoj
 chown -R syzoj:syzoj /opt/syzoj/data /opt/syzoj/sessions /opt/syzoj/config/web.json
 ```
+
+## 创建数据库
+执行如下命令启动 MariaDB 客户端：
+
+```bash
+mysql
+```
+
+在 MariaDB 客户端中执行以下命令创建数据库以及 SYZOJ 网站端连接数据库所使用的用户。
+
+```mysql
+CREATE DATABASE `syzoj` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+GRANT ALL PRIVILEGES ON `syzoj`.* TO "syzoj"@"localhost" IDENTIFIED BY "password";
+```
+
+以上命令中的 `password` 为 SYZOJ 网站端连接数据库的密码，请使用与上文配置中相同的值。
+
+进行完此步骤后，按下 <kbd>Ctrl</kbd> + <kbd>D</kbd> 以退出 MariaDB 客户端。
 
 ## 使用 systemd
 创建 `/etc/systemd/system/syzoj-web.service` 文件，填入如下内容：
